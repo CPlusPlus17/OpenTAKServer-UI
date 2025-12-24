@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM node:20-alpine AS build
+FROM docker.io/library/node:20-alpine AS build
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN yarn install
 RUN yarn build
 
 # Stage 2: Run
-FROM nginx:alpine
+FROM docker.io/library/nginx:alpine
 
 # Copy nginx config template for env substitution
 COPY nginx.conf /etc/nginx/templates/nginx.conf.template
