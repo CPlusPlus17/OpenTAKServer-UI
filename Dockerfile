@@ -3,11 +3,9 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY . .
 RUN corepack enable
 RUN yarn install
-
-COPY . .
 
 # Build the application
 RUN yarn build
