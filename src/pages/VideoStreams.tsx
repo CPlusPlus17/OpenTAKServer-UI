@@ -17,7 +17,7 @@ import { IconCheck, IconCircleMinus, IconPlus, IconVideo, IconX } from '@tabler/
 import { notifications } from '@mantine/notifications';
 import axios from '../axios_config';
 import { apiRoutes } from '../apiRoutes';
-import {t} from "i18next";
+import { t } from "i18next";
 
 export default function VideoStreams() {
     const [videoStreams, setVideoStreams] = useState<TableData>({
@@ -31,7 +31,7 @@ export default function VideoStreams() {
     const [deleteVideoOpened, setDeleteVideoOpened] = useState(false);
     const [deletePath, setDeletePath] = useState('');
     const [path, setPath] = useState('');
-    const [source, setSource] = useState<string|null>(null);
+    const [source, setSource] = useState<string | null>(null);
     const [showVideo, setShowVideo] = useState(false);
     const [videoUrl, setVideoUrl] = useState('');
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
@@ -39,7 +39,7 @@ export default function VideoStreams() {
     const [thumbnailOpened, setThumbnailOpened] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    function setRecord(path:string, record:boolean) {
+    function setRecord(path: string, record: boolean) {
         setLoading(true)
         axios.patch(
             apiRoutes.updateVideoStream,
@@ -75,9 +75,11 @@ export default function VideoStreams() {
         setLoading(true)
         axios.get(
             apiRoutes.video_streams,
-            { params: {
+            {
+                params: {
                     page: activePage,
-                } }
+                }
+            }
         ).then(r => {
             setLoading(false);
             if (r.status === 200) {
@@ -87,32 +89,32 @@ export default function VideoStreams() {
                     body: [],
                 };
 
-                r.data.results.map((row:any) => {
+                r.data.results.map((row: any) => {
                     if (tableData.body !== undefined) {
                         const thumbnail = <Image src={row.thumbnail} onClick={() => {
                             setThumbnail(row.thumbnail);
                             setThumbnailOpened(true);
                         }} />
                         const delete_button = <Button
-                          onClick={() => {
+                            onClick={() => {
                                 setDeleteVideoOpened(true);
                                 setDeletePath(row.path);
                             }}
-                          key={`${row.path}_delete`}
-                          rightSection={<IconCircleMinus size={14} />}
-                          color="red"
+                            key={`${row.path}_delete`}
+                            rightSection={<IconCircleMinus size={14} />}
+                            color="red"
                         >Delete
-                                              </Button>;
+                        </Button>;
 
                         const watch_button = <Button
-                          key={`${row.path}_watch`}
-                          onClick={() => {
-                            setVideoUrl(`${row.hls_link}?jwt=${localStorage.getItem('token')}`);
-                            setShowVideo(true);
-                            setPath(row.path);
-                        }}
+                            key={`${row.path}_watch`}
+                            onClick={() => {
+                                setVideoUrl(`${row.hls_link}?jwt=${localStorage.getItem('token')}`);
+                                setShowVideo(true);
+                                setPath(row.path);
+                            }}
                         >Watch
-                                             </Button>;
+                        </Button>;
                         let online_icon = null;
 
                         if (row.ready) {
@@ -122,10 +124,10 @@ export default function VideoStreams() {
                         }
 
                         const record = <Switch
-                          checked={row.record}
-                          onChange={(e) => {
-                              setRecord(row.path, e.target.checked); getVideoStreams();
-                          }}
+                            checked={row.record}
+                            onChange={(e) => {
+                                setRecord(row.path, e.target.checked); getVideoStreams();
+                            }}
                         />;
 
                         const webrtc_button = <CopyButton value={row.webrtc_link}>{({ copied, copy }) => (
@@ -135,7 +137,7 @@ export default function VideoStreams() {
                                 </Button>
                             </Tooltip>
                         )}
-                                              </CopyButton>;
+                        </CopyButton>;
 
                         const rtsp_button = <CopyButton value={row.rtsp_link}>{({ copied, copy }) => (
                             <Tooltip label={row.rtsp_link}>
@@ -183,9 +185,11 @@ export default function VideoStreams() {
         setLoading(true);
         axios.delete(
             apiRoutes.deleteVideoStream,
-            { params: {
+            {
+                params: {
                     path: deletePath,
-                } },
+                }
+            },
         ).then(r => {
             setLoading(false);
             notifications.show({
@@ -206,7 +210,7 @@ export default function VideoStreams() {
         });
     }
 
-    function addVideo(e:any) {
+    function addVideo(e: any) {
         setLoading(true);
         e.preventDefault();
         axios.post(
@@ -232,7 +236,15 @@ export default function VideoStreams() {
     }
 
     function startStreaming() {
-        window.open(`${window.location.origin}/webrtc/${localStorage.getItem('username')}_browser/publish?jwt=${localStorage.getItem('token')}`, '_blank');
+        // Construct subdomain URL: e.g. https://webrtc.ots-ui.idwd.ch
+        const protocol = window.location.protocol;
+        const domain = window.location.hostname;
+        const port = window.location.port ? `:${window.location.port}` : '';
+
+        // Check if we are already on a subdomain (optional) or just prepend
+        // Assuming the user sets up 'webrtc.domain.com'
+        const streamUrl = `${protocol}//webrtc.${domain}${port}/${localStorage.getItem('username')}_browser/publish?jwt=${localStorage.getItem('token')}`;
+        window.open(streamUrl, '_blank');
     }
 
     return (
@@ -241,10 +253,10 @@ export default function VideoStreams() {
 
             <Button onClick={() => { setAddVideoOpened(true); }} mb="md" mr="md" leftSection={<IconPlus size={14} />}>Add Video</Button>
             <Tooltip
-              multiline
-              w={220}
-              withArrow
-              label={t("Start streaming in the browser using your device's camera")}
+                multiline
+                w={220}
+                withArrow
+                label={t("Start streaming in the browser using your device's camera")}
             >
                 <Button onClick={() => { startStreaming(); }} mb="md" leftSection={<IconVideo size={14} />}>Start Streaming</Button>
             </Tooltip>
@@ -260,11 +272,11 @@ export default function VideoStreams() {
             <Modal opened={deleteVideoOpened} onClose={() => setDeleteVideoOpened(false)} title={t(`Are you sure you want to delete ${deletePath}?`)}>
                 <Center>
                     <Button
-                      mr="md"
-                      onClick={() => {
-                        deleteVideoStream();
-                        setDeleteVideoOpened(false);
-                    }}
+                        mr="md"
+                        onClick={() => {
+                            deleteVideoStream();
+                            setDeleteVideoOpened(false);
+                        }}
                     >Yes
                     </Button>
                     <Button onClick={() => setDeleteVideoOpened(false)}>No</Button>
@@ -274,23 +286,23 @@ export default function VideoStreams() {
                 <Image src={thumbnail} />
             </Modal>
 
-                    <AspectRatio ratio={16 / 9} display={showVideo ? 'block' : 'none'} h="100%" mb="xl" mt="md">
-                        <iframe
-                            src={videoUrl}
-                            title={path}
-                            style={{border: 0}}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                        />
-                        <Button
-                            fullWidth
-                            onClick={() => {
-                                setShowVideo(false);
-                                setVideoUrl('');
-                            }}
+            <AspectRatio ratio={16 / 9} display={showVideo ? 'block' : 'none'} h="100%" mb="xl" mt="md">
+                <iframe
+                    src={videoUrl}
+                    title={path}
+                    style={{ border: 0 }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                />
+                <Button
+                    fullWidth
+                    onClick={() => {
+                        setShowVideo(false);
+                        setVideoUrl('');
+                    }}
 
-                        >{t("Close Stream")}</Button>
-                    </AspectRatio>
+                >{t("Close Stream")}</Button>
+            </AspectRatio>
         </>
-);
+    );
 }
