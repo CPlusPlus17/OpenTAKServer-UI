@@ -232,7 +232,7 @@ export default function VideoStreams() {
     }
 
     function startStreaming() {
-        window.open(`${window.location.origin}:8889/${localStorage.getItem('username')}_browser/publish?jwt=${localStorage.getItem('token')}`, '_blank');
+        window.open(`${window.location.origin}/webrtc/${localStorage.getItem('username')}_browser/publish?jwt=${localStorage.getItem('token')}`, '_blank');
     }
 
     return (
